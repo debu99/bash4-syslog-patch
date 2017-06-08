@@ -18,9 +18,11 @@ tar -zxvf bash-4.4.tar.gz
 cd bash-4.4
 
 vi config-top.h
+
 ...
 
 vi bashhist.c
+
 ...
 
 diff -Npru config-top.original.h config-top.h >config-top.h.patch
@@ -30,9 +32,13 @@ diff -Npru bashhist.original.c bashhist.c >bashhist.c.patch
 
 
 ./configure -prefix=/usr/local/bash_4.4
+
 make
+
 make install
 
 
+
 echo '/usr/local/bash_4.4/bin/bash' >> /etc/shells
+
 sed -i '/root/s#/bin/bash#/usr/local/bash_4.4/bin/bash#' /etc/passwd
