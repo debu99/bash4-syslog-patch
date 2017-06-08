@@ -1,0 +1,82 @@
+--- bashhist.original.c	2017-06-08 10:57:32.009914145 +0000
++++ bashhist.c	2017-06-08 11:02:59.010614358 +0000
+@@ -31,6 +31,16 @@
+ 
+ #include "bashtypes.h"
+ #include <stdio.h>
++
++#include <stdlib.h>
++#include <unistd.h>
++#include <netinet/in.h>
++#include <arpa/inet.h>
++#include <sys/socket.h>
++#include <sys/types.h>
++#include <utmp.h>
++#include <string.h>
++
+ #include <errno.h>
+ #include "bashansi.h"
+ #include "posixstat.h"
+@@ -45,6 +55,8 @@
+ #include "shell.h"
+ #include "flags.h"
+ #include "input.h"
++#include "builtins.h"
++
+ #include "parser.h"	/* for the struct dstack stuff. */
+ #include "pathexp.h"	/* for the struct ignorevar stuff */
+ #include "bashhist.h"	/* matching prototypes and declarations */
+@@ -767,13 +779,51 @@ bash_syslog_history (line)
+       first = 0;
+     }
+ 
++
++
++        char *cp, *tty;
++        char addrtext[INET6_ADDRSTRLEN];
++        struct utmp *ut;
++        struct utmp search;
++        int returnval;
++        if (isatty (0) && (cp = ttyname (0))) {
++                if (strncmp (cp, "/dev/", 5) == 0)
++                        tty = cp + 5;
++                else
++                	tty = cp;
++        } else {
++                tty = "???";
++        }
++        if (!tty || !*tty || !strcmp(tty, "???"))
++                return -1;
++ 
++        returnval = 0;
++        memset(&search, 0, sizeof(search));
++        snprintf(search.ut_line, sizeof(search.ut_line) - 1, "%s", tty);
++        setutent();
++        ut = getutline(&search);
++        if (!ut)
++                return -1;
++
++   if (ut->ut_addr_v6[0]) {
++    if (!(ut->ut_addr_v6[1] | ut->ut_addr_v6[2] | ut->ut_addr_v6[3])) {
++     inet_ntop(AF_INET, ut->ut_addr_v6, addrtext, sizeof(addrtext));
++    } else {
++     inet_ntop(AF_INET6, ut->ut_addr_v6, addrtext, sizeof(addrtext));
++    }
++   }
++
++
++
+   if (strlen(line) < SYSLOG_MAXLEN)
+-    syslog (SYSLOG_FACILITY|SYSLOG_LEVEL, "HISTORY: PID=%d UID=%d %s", getpid(), current_user.uid, line);
++   /*syslog (SYSLOG_FACILITY|SYSLOG_LEVEL, "HISTORY: PID=%d UID=%d %s", getpid(), current_user.uid, line);*/
++   syslog (SYSLOG_FACILITY|SYSLOG_LEVEL, "HISTORY: IP=%s PID=%d PPID=%d SID=%d UID=%d USER=%s LOGIN=%s CMD=%s", addrtext, getpid(), getppid(), getsid(getpid()), current_user.uid, current_user.user_name, getlogin(), line); 
+   else
+     {
+       strncpy (trunc, line, SYSLOG_MAXLEN);
+       trunc[SYSLOG_MAXLEN - 1] = '\0';
+-      syslog (SYSLOG_FACILITY|SYSLOG_LEVEL, "HISTORY (TRUNCATED): PID=%d UID=%d %s", getpid(), current_user.uid, trunc);
++      /*syslog (SYSLOG_FACILITY|SYSLOG_LEVEL, "HISTORY (TRUNCATED): PID=%d UID=%d %s", getpid(), current_user.uid, trunc);*/
++      syslog (SYSLOG_FACILITY|SYSLOG_LEVEL, "HISTORY: IP=%s PID=%d PPID=%d SID=%d UID=%d USER=%s LOGIN=%s CMD=%s", addrtext, getpid(), getppid(), getsid(getpid()), current_user.uid, current_user.user_name, getlogin(), trunc); 
+     }
+ }
+ #endif
