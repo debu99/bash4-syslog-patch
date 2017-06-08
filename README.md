@@ -9,6 +9,7 @@ With no patch(but with syslog enable in config-top.h) you can see in log: (with 
 
 Sep 20 20:12:49 -bash: HISTORY: PID=1722 UID=0 cat /var/log/syslog
 
+
 With these patches, you can see:(with sudo -s ==> root):
 
 Jun  8 11:04:04 ip-192-168-1-188 -bash[15245]: HISTORY: IP=123.444.666.33 PID=15245 PPID=15244 SID=15219 UID=0 USER=root LOGIN=ec2-user CMD=pwd
@@ -16,7 +17,9 @@ Jun  8 11:04:04 ip-192-168-1-188 -bash[15245]: HISTORY: IP=123.444.666.33 PID=15
 
 -------------------------------------------------------
 wget http://ftp.gnu.org/gnu/bash/bash-4.4.tar.gz
+
 tar -zxvf bash-4.4.tar.gz
+
 cd bash-4.4
 
 vi config-top.h
