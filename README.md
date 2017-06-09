@@ -22,13 +22,9 @@ tar -zxvf bash-4.4.tar.gz
 
 cd bash-4.4
 
-vi config-top.h
+patch config-top.h <config-top.h.patch
 
-...
-
-vi bashhist.c
-
-...
+patch bashhist.c <bashhist.c.patch
 
 diff -Npru config-top.original.h config-top.h >config-top.h.patch
 
