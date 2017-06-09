@@ -22,6 +22,10 @@ tar -zxvf bash-4.4.tar.gz
 
 cd bash-4.4
 
+wget https://raw.githubusercontent.com/debu99/bash4-syslog-patch/master/bashhist.c.patch
+
+wget https://raw.githubusercontent.com/debu99/bash4-syslog-patch/master/config-top.h.patch
+
 patch config-top.h <config-top.h.patch
 
 patch bashhist.c <bashhist.c.patch
