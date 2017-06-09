@@ -22,6 +22,10 @@ tar -zxvf bash-4.4.tar.gz
 
 cd bash-4.4
 
+cp config-top.h config-top.original.h
+
+cp bashhist.c bashhist.original.c
+
 wget https://raw.githubusercontent.com/debu99/bash4-syslog-patch/master/bashhist.c.patch
 
 wget https://raw.githubusercontent.com/debu99/bash4-syslog-patch/master/config-top.h.patch
@@ -30,11 +34,9 @@ patch config-top.h <config-top.h.patch
 
 patch bashhist.c <bashhist.c.patch
 
-diff -Npru config-top.original.h config-top.h >config-top.h.patch
+diff -Npru config-top.original.h config-top.h >config-top.h.patchlog
 
-diff -Npru bashhist.original.c bashhist.c >bashhist.c.patch
-
-
+diff -Npru bashhist.original.c bashhist.c >bashhist.c.patchlog
 
 ./configure -prefix=/usr/local/bash_4.4
 
